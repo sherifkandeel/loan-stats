@@ -1,0 +1,78 @@
+swagger: '2.0'
+
+info:
+  title: loan-stats
+  version: '1.0'
+  description: API that calculates APR, IRR for a given loan object
+
+host: localhost:8080
+basePath: /
+schemes:
+  - http
+
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /health:
+    get:
+      description: Health check for the service
+      responses:
+        '200':
+          description: Service is up and healthy
+
+  /calculation:
+    post:
+      description: Calculate APR and IRR on a posted loan
+      parameters:
+        - in: body
+          name: Loan
+          schema:
+              $ref: "#/definitions/Loan"
+      responses:
+        '200':
+          description: Request for loan calculation was accepted
+          schema:
+            $ref: '#/definitions/CalculatedRate'
+        '400':
+          description: Request was not processed due to error in request
+        '422':
+          description: Requested payload was not valid
+
+
+definitions:
+  Loan:
+    type: object
+    properties:
+      principal:
+        type: number
+      upfrontFee:
+        type: number
+      upfrontCreditlineFee:
+        type: number
+      schedule:
+        type: array
+        items:
+          $ref: "#/definitions/Schedule"
+
+  Schedule:
+    type: object
+    properties:
+      id:
+        type: integer
+      date:
+        type: string
+      principal:
+        type: number
+      interestFee:
+        type: number
+
+  CalculatedRate:
+    type: object
+    properties:
+      apr:
+        type: number
+      irr:
+        type: number
